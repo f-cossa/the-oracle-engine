@@ -122,56 +122,48 @@ function EmailStep({
 }) {
   const [email, setEmail] = useState("");
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  function validate(): string | null {
     const trimmed = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(trimmed)) {
       toast.error("Insere um e-mail válido.");
-      return;
+      return null;
     }
+    return trimmed;
+  }
+
+  async function startSignup(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = validate();
+    if (!trimmed) return;
     setBusy(true);
     try {
-      // Try to fetch a profile flag via signing in with a dummy password — instead
-      // we just send an OTP and let the user enter PIN if known. Simpler:
-      // send OTP for fresh signups; if the user knows the PIN, they can skip.
-      // To distinguish, we ask the server: try sign-in with an invalid password;
-      // if it returns "Invalid login" the email already exists.
-      const probe = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithOtp({
         email: trimmed,
-        password: "__voz_probe__not_a_real_password__",
+        options: { shouldCreateUser: true },
       });
-
-      // If credentials are invalid -> account exists.
-      const errMsg = probe.error?.message?.toLowerCase() ?? "";
-      const accountExists = errMsg.includes("invalid login") || errMsg.includes("invalid_credentials");
-
-      if (accountExists) {
-        onPinExisting(trimmed);
-      } else {
-        // Send OTP code (creates user if missing).
-        const { error } = await supabase.auth.signInWithOtp({
-          email: trimmed,
-          options: { shouldCreateUser: true },
-        });
-        if (error) throw error;
-        toast.success("Código enviado para o teu e-mail.");
-        onContinue(trimmed, "signup");
-      }
+      if (error) throw error;
+      toast.success("Código enviado para o teu e-mail.");
+      onContinue(trimmed, "signup");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Falha ao enviar código.";
-      toast.error(msg);
+      toast.error(err instanceof Error ? err.message : "Falha ao enviar código.");
     } finally {
       setBusy(false);
     }
   }
 
+  function goToPin() {
+    const trimmed = validate();
+    if (!trimmed) return;
+    onPinExisting(trimmed);
+  }
+
   return (
-    <form onSubmit={submit} className="space-y-5">
+    <form onSubmit={startSignup} className="space-y-5">
       <Header
         icon={<Mail className="size-3.5" />}
         kicker="Passo 01"
         title="Identificação"
-        subtitle="Insere o teu e-mail. Enviamos um código único."
+        subtitle="Insere o teu e-mail. Já tens conta? Entra com o PIN."
       />
       <input
         type="email"
@@ -182,7 +174,15 @@ function EmailStep({
         placeholder="teu@email.com"
         className="w-full border border-cyan-vivid/30 bg-obsidian/60 px-4 py-3 text-sm text-foreground placeholder:text-ghost/50 outline-none focus:border-cyan-vivid"
       />
-      <PrimaryButton busy={busy}>Continuar</PrimaryButton>
+      <PrimaryButton busy={busy}>Criar conta · Receber código</PrimaryButton>
+      <button
+        type="button"
+        onClick={goToPin}
+        disabled={busy}
+        className="block w-full text-center text-[10px] uppercase tracking-[0.3em] text-ghost hover:text-cyan-vivid"
+      >
+        Já tenho conta — entrar com PIN
+      </button>
     </form>
   );
 }
