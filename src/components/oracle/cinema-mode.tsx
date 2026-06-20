@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { useAppSettings } from "@/lib/app-settings";
+import { startAmbience, stopAmbience } from "@/lib/audio-ambience";
 
 interface CinemaModeProps {
   open: boolean;
