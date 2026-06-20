@@ -14,6 +14,15 @@ interface CinemaModeProps {
 export function CinemaMode({ open, question, answer, audioBase64, onClose }: CinemaModeProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const settings = useAppSettings();
+
+  useEffect(() => {
+    if (!open) return;
+    if (settings.ambienceEnabled) {
+      startAmbience(settings.ambienceCategory, settings.ambienceVolume);
+    }
+    return () => stopAmbience();
+  }, [open, settings.ambienceEnabled, settings.ambienceCategory, settings.ambienceVolume]);
 
   useEffect(() => {
     if (!open) return;
