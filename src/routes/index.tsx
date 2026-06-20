@@ -338,7 +338,11 @@ function OraclePage() {
         onClose={() => setCinemaOpen(false)}
       />
 
-      <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onAskText={() => setTextMode(true)}
+      />
     </div>
   );
 }
