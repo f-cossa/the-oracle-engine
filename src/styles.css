@@ -82,11 +82,44 @@
   /* same as :root — app is dark-only */
 }
 
+/* === Theme: Branco Elegante (white + cyan neon) === */
+:root[data-theme="branco"] {
+  --obsidian: #ffffff;
+  --foreground: oklch(0.18 0.01 260);
+  --ghost: #5e6a73;
+  --card: oklch(0.97 0.005 250);
+  --card-foreground: oklch(0.18 0.01 260);
+  --popover: oklch(0.99 0.003 250);
+  --popover-foreground: oklch(0.18 0.01 260);
+  --secondary: oklch(0.94 0.006 250);
+  --secondary-foreground: oklch(0.2 0.01 260);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.42 0.015 255);
+  --primary-foreground: #ffffff;
+  --accent-foreground: #ffffff;
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 14%);
+}
+
 html,
 body {
   background: var(--obsidian);
   color: var(--foreground);
   font-family: var(--font-display);
+}
+
+/* Custom-theme background image overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--app-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--app-bg-opacity, 0);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* === Oracle motion === */

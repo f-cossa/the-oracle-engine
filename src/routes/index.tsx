@@ -9,6 +9,7 @@ import { askOracle } from "@/lib/oracle.functions";
 import { SoundWaves } from "@/components/oracle/sound-waves";
 import { CinemaMode } from "@/components/oracle/cinema-mode";
 import { MenuSheet } from "@/components/oracle/menu-sheet";
+import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -73,11 +74,13 @@ function OraclePage() {
     sttSupportedRef.current = Boolean(SR);
   }, []);
 
+  const settings = useAppSettings();
+
   async function submitQuestion(question: string) {
     setStatus("thinking");
     setTranscript(question);
     try {
-      const res = await ask({ data: { question, speak: true } });
+      const res = await ask({ data: { question, speak: settings.voiceEnabled } });
       setAnswer(res.answer);
       setAudioB64(res.audioBase64);
       setStatus("answered");
@@ -338,7 +341,11 @@ function OraclePage() {
         onClose={() => setCinemaOpen(false)}
       />
 
-      <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onAskText={() => setTextMode(true)}
+      />
     </div>
   );
 }
