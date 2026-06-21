@@ -17,24 +17,33 @@ export type Database = {
       oracle_history: {
         Row: {
           answer: string
+          audio_url: string | null
           created_at: string
           id: string
+          language: string | null
           question: string
           user_id: string
+          video_url: string | null
         }
         Insert: {
           answer: string
+          audio_url?: string | null
           created_at?: string
           id?: string
+          language?: string | null
           question: string
           user_id: string
+          video_url?: string | null
         }
         Update: {
           answer?: string
+          audio_url?: string | null
           created_at?: string
           id?: string
+          language?: string | null
           question?: string
           user_id?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -62,15 +71,82 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          payment_method: string | null
+          payment_ref: string | null
+          plan: string
+          starts_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          payment_method?: string | null
+          payment_ref?: string | null
+          plan: string
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          payment_method?: string | null
+          payment_ref?: string | null
+          plan?: string
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_premium: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -197,6 +273,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
